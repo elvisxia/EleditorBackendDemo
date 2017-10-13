@@ -18,6 +18,8 @@
         "</div>"+
         "</div>";
 
+    
+
     var _options = {
         "file": {
             "uploadUrl": "",
@@ -66,6 +68,19 @@
                 _options[key][subKey] = opts[key][subKey];
             }
         }
+    }
+
+    function startLoading(){
+        //var loadingTemplate="<div id='eluploader_loadermask'><div id='eluploader_loader'></div></div>"
+        var loaderMask=document.createElement("div");
+        loaderMask.id="eluploader_loadermask";
+        loaderMask.innerHTML="<div id='eluploader_loader'></div>";
+        document.body.appendChild(loaderMask);
+    }
+
+    function stopLoading(){
+        var loaderMask=document.getElementById("eluploader_loadermask");
+        document.body.removeChild(loaderMask);
     }
 
     function switchMode(mode)
@@ -133,6 +148,8 @@
             var re = /(http:\/\/|https:\/\/)/g;
             //upload file from formdata
             if (formData && formData.has('file')) {
+                //start loading
+                startLoading();
                 uploadFile();
             }
             //upload image from the link
@@ -159,6 +176,7 @@
                 resText = resText.replace(/"/g, "");
                 //get the url and add the picture to the context
                 _options[_mode].uploadCallback(resText);
+                stopLoading();
                 eluploader.hideAndClear();
             }
         }

@@ -29,6 +29,7 @@
             "<li id='fa-link' class='fa fa-link'></li>" +
             "<li id='fa-quote' class='fa fa-quote-left'></li>" +
             "<li id='fa-picture' class='fa fa-picture-o'></li>" +
+            "<li id='fa-file' class='fa fa-file'></li>"+
             "<li id='fa-code' class='fa fa-code'></li>" +
             "<i class='separator'>|</i>" +
             "<li id='fa-list-ol' class='fa fa-list-ul'></li>" +
@@ -61,12 +62,13 @@
             case 'fa-bold': insertStringOnStartEnd("**", "**","enter text here");  break;
             case 'fa-italic': insertStringOnStartEnd("*", "*", "enter text here");  break;
             case 'fa-header': if (cursorInLineStart()) { insertStringOnStartEnd("##", "##\n", "Heading"); } else { insertStringOnStartEnd("", "\n----------\n", "Heading"); }  break;
-            case 'fa-picture': openModelDialogForUpload();  break;
+            case 'fa-picture': openModelDialogForUpload('image');  break;
             case 'fa-link': insertStringOnStartEnd("[","](http://)","enter link description here");  break;
             case 'fa-quote': insertStringOnStartEnd("\n>", "","enter code here");  break;
             case 'fa-code': if (cursorInLineStart()) { insertStringOnStartEnd("\n    ", "\n", "enter code here"); } else { insertStringOnStartEnd("`", "`", "enter code here"); } break;
             case 'fa-list-ul': insertStringOnStartEnd("\n 1. ", "\n", "List Item"); break;
             case 'fa-list-ol': insertStringOnStartEnd("\n - ", "\n", "List Item"); break;
+            case 'fa-file': openModelDialogForUpload('file');break;
         }
 
         _options.onTextChange();
@@ -146,8 +148,8 @@
         
     }
 
-    function openModelDialogForUpload() {
-        eluploader.show('image');
+    function openModelDialogForUpload(mode) {
+        eluploader.show(mode);
     }
 
     function initOptions(opts)
@@ -167,8 +169,12 @@
 
         //init the uploader
         var imageCallback = function (text) {
-            var str = "![enter image description here](" + text + ")";
-            insertStringOnCursor(str);
+            insertStringOnStartEnd("![","](" + text + ")","enter image description here");
+            _options.onTextChange();
+        }
+        var fileCallback=function(text)
+        {
+            insertStringOnStartEnd("[","](" + text + ")","enter file description here");
             _options.onTextChange();
         }
         eluploader.render({
@@ -177,7 +183,8 @@
                 uploadCallback: imageCallback
             },
             "file": {
-
+                uploadUrl:_options.uploadUrl,
+                uploadCallback:fileCallback
             }
         });
 
