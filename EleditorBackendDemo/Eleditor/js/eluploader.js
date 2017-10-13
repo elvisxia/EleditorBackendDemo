@@ -9,16 +9,16 @@
         "</div>" +
         "<div id='eluploader_weblink'>" +
         "<span id='eluploader_linkguide'>You can also provide a <a id='eluploader_linkhref' href='#'>link from the web</a></span>" +
-        "<span id='eluploader_link'>Web link from <input id='eluploader_webPic' type='text' width=40;> | <a id='eluploader_cancelLink' href='#'>cancel</a></span>"+
+        "<span id='eluploader_link'>Web link from <input id='eluploader_webPic' type='text' width=40;> | <a id='eluploader_cancelLink' href='#'>cancel</a></span>" +
         "</div>" +
         "</div>" +
         "<div id='eluploader_bottom_zone'>" +
-        "<button id='eluploader_save' class='btn btn-success'>Add Picture</button>" +
-        "</div>"+
-        "</div>"+
+        "<button id='eluploader_save' class='btn btn-success'>Add</button>" +
+        "</div>" +
+        "</div>" +
         "</div>";
 
-    
+
 
     var _options = {
         "file": {
@@ -26,7 +26,7 @@
             "maxSize": 10,
             "uploadCallback": function (args) { },
             "acceptTypes": {
-                'pattern': /(\S+)\/(\S+)/
+                'all': true
             }
         },
         "image": {
@@ -41,15 +41,14 @@
         }
     }
 
-    var _linkGuide, _linkhref, _link, _cancelLink, _dropzone, _btnAddPic,_webPic;
-    var formData = new FormData();
+    var _linkGuide, _linkhref, _link, _cancelLink, _dropzone, _btnAddPic, _webPic;
+    var formData;
     var maxSize;
-    var _mode="image";
+    var _mode = "image";
     var fileMode = false;
-    var isEdgeIE = formData.has ? false : true;
-    
-    function initFormDataObjForEdgeIE()
-    {
+    var isEdgeIE = new FormData().has ? false : true;
+
+    function initFormDataObjForEdgeIE() {
         formData.has = function (str) {
             return true;
         }
@@ -63,28 +62,26 @@
 
     function initOptions(opts) {
         for (var key in opts) {
-            for (var subKey in opts[key])
-            {
+            for (var subKey in opts[key]) {
                 _options[key][subKey] = opts[key][subKey];
             }
         }
     }
 
-    function startLoading(){
+    function startLoading() {
         //var loadingTemplate="<div id='eluploader_loadermask'><div id='eluploader_loader'></div></div>"
-        var loaderMask=document.createElement("div");
-        loaderMask.id="eluploader_loadermask";
-        loaderMask.innerHTML="<div id='eluploader_loader'></div>";
+        var loaderMask = document.createElement("div");
+        loaderMask.id = "eluploader_loadermask";
+        loaderMask.innerHTML = "<div id='eluploader_loader'></div>";
         document.body.appendChild(loaderMask);
     }
 
-    function stopLoading(){
-        var loaderMask=document.getElementById("eluploader_loadermask");
+    function stopLoading() {
+        var loaderMask = document.getElementById("eluploader_loadermask");
         document.body.removeChild(loaderMask);
     }
 
-    function switchMode(mode)
-    {
+    function switchMode(mode) {
         _mode = mode;
         //file upload
         if (mode == "file") {
@@ -93,34 +90,31 @@
             _dropzone.innerHTML = "<p>Drag and Drop<span>(File Max " + _options[_mode].maxSize + "Mb)</span></p>";
         }
         //image upload by default
-        else
-        {
+        else {
             fileMode = false;
             document.getElementById("eluploader_weblink").style.display = "block";
             _dropzone.innerHTML = "<p>Drag and Drop<span>(Image Max " + _options[_mode].maxSize + "Mb)</span></p>";
         }
     }
 
-    function initControl()
-    {
-         _linkGuide = document.getElementById('eluploader_linkguide');
-         _linkhref = document.getElementById('eluploader_linkhref');
-         _link = document.getElementById('eluploader_link');
-         _cancelLink = document.getElementById('eluploader_cancelLink');
-         _webPic = document.getElementById('eluploader_webPic');
-         _dropzone = document.getElementById('eluploader_drop');
-         _btnAddPic = document.getElementById('eluploader_save');
+    function initControl() {
+        _linkGuide = document.getElementById('eluploader_linkguide');
+        _linkhref = document.getElementById('eluploader_linkhref');
+        _link = document.getElementById('eluploader_link');
+        _cancelLink = document.getElementById('eluploader_cancelLink');
+        _webPic = document.getElementById('eluploader_webPic');
+        _dropzone = document.getElementById('eluploader_drop');
+        _btnAddPic = document.getElementById('eluploader_save');
         _linkGuide.style.display = "block";
         _link.style.display = "none";
-        
+
         //events
         window.onclick = function (evt) {
             if (evt.target.id == "eluploader_container") {
                 eluploader.hideAndClear();
             }
         };
-        _linkhref.onclick = function (evt)
-        {
+        _linkhref.onclick = function (evt) {
             _linkGuide.style.display = "none";
             _link.style.display = "block";
         }
@@ -128,34 +122,31 @@
             _linkGuide.style.display = "block";
             _link.style.display = "none";
         }
-        _dropzone.ondragover = function (e)
-        {
+        _dropzone.ondragover = function (e) {
             return false;
         }
-        _dropzone.ondragend = function (e)
-        {
+        _dropzone.ondragend = function (e) {
             return false;
         }
-        _dropzone.ondrop = function (e)
-        {
+        _dropzone.ondrop = function (e) {
             e.preventDefault();
             readFiles(e.dataTransfer.files);
         }
 
         //button click event of Add Picture
-        _btnAddPic.onclick = function (e)
-        {
+        _btnAddPic.onclick = function (e) {
             var re = /(http:\/\/|https:\/\/)/g;
-            //upload file from formdata
-            if (formData && formData.has('file')) {
+
+            //upload image from the link
+            if (_webPic.value && re.exec(_webPic.value)) {
+                _options[_mode].uploadCallback(_webPic.value);
+                eluploader.hideAndClear();
+            }
+            else if (formData && formData.has('file')) {
+                //upload file from formdata
                 //start loading
                 startLoading();
                 uploadFile();
-            }
-            //upload image from the link
-            else if (_webPic.value && re.exec(_webPic.value)) {
-                _options[_mode].uploadCallback(_webPic.value);
-                eluploader.hideAndClear();
             }
             //No image
             else {
@@ -164,14 +155,11 @@
         }
     }
     //Upload Image using Ajax
-    function uploadFile()
-    {
+    function uploadFile() {
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', _options[_mode].uploadUrl);
-        xhr.onreadystatechange = function (e)
-        {
-            if (xhr.readyState === XMLHttpRequest.DONE)
-            {
+        xhr.open('POST', _options[_mode].uploadUrl, true);
+        xhr.onreadystatechange = function (e) {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
                 var resText = xhr.responseText;
                 resText = resText.replace(/"/g, "");
                 //get the url and add the picture to the context
@@ -184,13 +172,11 @@
         xhr.send(formData);
     }
     //add the file to FormData
-    function readFiles(files)
-    {
+    function readFiles(files) {
         var file = files[0];
 
         if (!fileMode) {
-            if (!_options[_mode].acceptTypes[file.type])
-            {
+            if (!_options[_mode].acceptTypes[file.type]) {
                 alert("Wrong file type!!");
                 return;
             }
@@ -203,8 +189,7 @@
             formData.delete('file');
         }
 
-        if (file.size > _options[_mode].maxSize * 1024 * 1024)
-        {
+        if (file.size > _options[_mode].maxSize * 1024 * 1024) {
             window.alert("The size of the file is too large!");
             return;
         }
@@ -212,10 +197,9 @@
         previewFile(files[0]);
     }
     //append the image to eluploader_drop
-    function previewFile(file)
-    {
-        var pattern = _options[_mode].acceptTypes['pattern'];
-        var reg = new RegExp(pattern, 'g');
+    function previewFile(file) {
+        //var pattern = _options[_mode].acceptTypes['pattern'];
+        //var reg = new RegExp(pattern, 'g');
         //upload image
         if (_options[_mode].acceptTypes[file.type] == true) {
             var reader = new FileReader();
@@ -230,8 +214,7 @@
             reader.readAsDataURL(file);
         }
         //upload file
-        else if (reg.test(file.type))
-        {
+        else if (_options[_mode].acceptTypes[file.type] || _options[_mode].acceptTypes["all"]) {
             var div = document.createElement("div");
             div.innerText = file.name;
             _dropzone.innerHTML = "";
@@ -267,8 +250,7 @@
             var eluploader_container = document.getElementById("eluploader_container");
             if (eluploader_container != null) {
                 return;
-            } else
-            {
+            } else {
                 document.body.innerHTML += template;
                 document.getElementById("eluploader_container").style.display = "none";
             }
@@ -279,28 +261,25 @@
         show: function (mode) {
             switchMode(mode);
             var container = document.getElementById("eluploader_container");
-            if (container != null)
-            {
+            if (container != null) {
                 container.style.display = "block";
             }
         },
         hideAndClear: function () {
             var container = document.getElementById("eluploader_container");
-            if (container != null)
-            {
+            if (container != null) {
                 container.style.display = "none";
             }
 
             //TO-DO:remove image and revert css style to original
-            if (_dropzone)
-            {
+            if (_dropzone) {
                 _dropzone.innerHTML = "<p>Drag and Drop<span>(Picture Max 2Mb)</span></p>";
             }
 
             //clear formdata
-            if (formData.has('file'))
-            {
+            if (formData && formData.has && formData.has('file')) {
                 formData.delete('file');
+                formData = null;
             }
 
             _webPic.value = "";

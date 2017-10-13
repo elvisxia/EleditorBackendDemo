@@ -8,7 +8,7 @@
 
         $scope.editor = eleditor.render({
             elementId: "divInput",//the div element that will be rendered
-            uploadUrl:"http://localhost:1137/api/imageupload/uploadfile",
+            uploadUrl:"http://10.168.172.166:4033/api/imageupload/uploadfile",
             previewElementId:"divResult",//the preview div element
             textareaId: "mTextArea",//the id of the textarea will be applied
             onTextChange: function () {
