@@ -292,6 +292,11 @@
                 formData.delete('file');
                 formData = null;
             }
+            //clear the input selection
+            var inputFile = document.getElementById("inputFile");
+            if (inputFile && inputFile.value) {
+                inputFile.value = "";
+            }
 
             _webPic.value = "";
         }

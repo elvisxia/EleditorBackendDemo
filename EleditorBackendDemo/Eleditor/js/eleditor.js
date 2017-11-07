@@ -175,7 +175,12 @@
         var tmpMiddleText = "";
         for (let i = 0; i < lines.length; i++) {
             let tmpStr = lines[i];
-            tmpMiddleText += tmpStr.substr(0, lineIndex).trim() + insertStr + tmpStr.substr(lineIndex, tmpStr.length).trim() + "\n";
+            if (i == 0) {
+                tmpMiddleText += tmpStr.substr(0, lineIndex).trim() + insertStr + tmpStr.substr(lineIndex, tmpStr.length).trim() + "\n";
+            } else {
+                tmpMiddleText += tmpStr.substr(0, lineIndex) + insertStr + tmpStr.substr(lineIndex, tmpStr.length) + "\n";
+            }
+            
         }
         tmpMiddleText = tmpMiddleText.substr(0, tmpMiddleText.length - 1);
         _eleditorContent.value = data.textBefore + startStr + tmpMiddleText + endStr + data.textAfter;

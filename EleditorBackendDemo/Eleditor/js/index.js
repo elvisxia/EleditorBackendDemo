@@ -22,6 +22,7 @@
         var textArea = document.getElementById('mTextArea');
         var result = document.getElementById('divResult');
         textArea.oninput = function (evt) {
+
             result.innerHTML = converter.makeHtml(textArea.value);
         };
 
