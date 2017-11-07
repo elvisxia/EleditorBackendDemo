@@ -10,9 +10,11 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using System.Web.UI.WebControls;
+using System.Web.Http.Cors;
 
 namespace EleditorBackendDemo.Controllers
 {
+    [EnableCors(origins:"*",headers:"*",methods:"*")]
     public class ImageUploadController : ApiController
     {
         // GET api/<controller>
@@ -32,7 +34,7 @@ namespace EleditorBackendDemo.Controllers
 
         [HttpPost]
         public async Task<HttpResponseMessage> UploadFile()
-        { 
+        {
             // Verify that this is an HTML Form file upload request
             if (!Request.Content.IsMimeMultipartContent("form-data"))
             {

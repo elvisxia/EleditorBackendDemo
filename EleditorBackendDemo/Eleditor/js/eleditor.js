@@ -1,10 +1,10 @@
-﻿var eleditor=(function () {
+﻿var eleditor = (function () {
     "use strict"
 
     //internal options
     var _options = {
         elementId: null,
-        previewElementId:"divResult",
+        previewElementId: "divResult",
         uploadUrl: "http://localhost:4033/api/imageupload/uploadfile",
         textareaId: "textareaId",
         onTextChange: function () { }
@@ -16,8 +16,8 @@
     var _eleditorContent = {};
     var _eleditorUl = {};
     var _previewElement = null;
-    
-    
+
+
     //initialize the template
     function initTemplate() {
         _template = "<div class='eleditor_container'>" +
@@ -29,7 +29,7 @@
             "<li id='fa-link' class='fa fa-link'></li>" +
             "<li id='fa-quote' class='fa fa-quote-left'></li>" +
             "<li id='fa-picture' class='fa fa-picture-o'></li>" +
-            "<li id='fa-file' class='fa fa-file'></li>"+
+            "<li id='fa-file' class='fa fa-file'></li>" +
             "<li id='fa-code' class='fa fa-code'></li>" +
             "<i class='separator'>|</i>" +
             "<li id='fa-list-ol' class='fa fa-list-ul'></li>" +
@@ -56,38 +56,84 @@
     }
 
     //btns click event listeners
-    function eleditor_btnsClick(evt)
-    {
+    function eleditor_btnsClick(evt) {
+        //init the textBefore textAfter and textMiddle
+        var value = _eleditorContent.value ? _eleditorContent.value : _eleditorContent.innerText;
+        var selectionStart = _eleditorContent.selectionStart;
+        var selectionEnd = _eleditorContent.selectionEnd;
+        var textBefore = _eleditorContent.value.substring(0, selectionStart);
+        var textMiddle = _eleditorContent.value.substring(selectionStart, selectionEnd);
+        var textAfter = _eleditorContent.value.substring(selectionEnd, value.length);
+
+        var data = {
+            textBefore: textBefore,
+            textMiddle: textMiddle,
+            textAfter: textAfter,
+            selectionStart: selectionStart,
+            selectionEnd: selectionEnd
+        }
+
+        //different buttons add different strings
         switch (evt.srcElement.id) {
-            case 'fa-bold': insertStringOnStartEnd("**", "**","enter text here");  break;
-            case 'fa-italic': insertStringOnStartEnd("*", "*", "enter text here");  break;
-            case 'fa-header': if (cursorInLineStart()) { insertStringOnStartEnd("##", "##\n", "Heading"); } else { insertStringOnStartEnd("", "\n----------\n", "Heading"); }  break;
-            case 'fa-picture': openModelDialogForUpload('image');  break;
-            case 'fa-link': insertStringOnStartEnd("[","](http://)","enter link description here");  break;
-            case 'fa-quote': insertStringOnStartEnd("\n>", "","enter code here");  break;
-            case 'fa-code': if (cursorInLineStart()) { insertStringOnStartEnd("\n    ", "\n", "enter code here"); } else { insertStringOnStartEnd("`", "`", "enter code here"); } break;
-            case 'fa-list-ul': insertStringOnStartEnd("\n 1. ", "\n", "List Item"); break;
-            case 'fa-list-ol': insertStringOnStartEnd("\n - ", "\n", "List Item"); break;
-            case 'fa-file': openModelDialogForUpload('file');break;
+            case 'fa-bold': insertStringOnStartEnd("**", "**", "enter text here", data); break;
+            case 'fa-italic': insertStringOnStartEnd("*", "*", "enter text here", data); break;
+            case 'fa-header': if (cursorInLineStart()) { insertStringOnStartEnd("##", "##\n", "Heading", data); } else { insertStringOnStartEnd("", "\n----------\n", "Heading", data); } break;
+            case 'fa-picture': openModelDialogForUpload('image'); break;
+            case 'fa-link': insertStringOnStartEnd("[", "](http://)", "enter link description here", data); break;
+            case 'fa-quote': 
+                {
+                    data.textBefore = data.textBefore.trim() + "\n\n";
+                    data.textAfter = "\n\n" + data.textAfter.trim();
+                    data.textMiddle = data.textMiddle.trim();
+                    insertStringOnEveryLine("", "", ">", 0, data);
+                }
+                break;
+            case 'fa-code':  
+                {
+                    let startLineNum = getLineNum(selectionStart);
+                    let endLineNum = getLineNum(selectionEnd);
+                    if (startLineNum != endLineNum || hasSelectedWholeLine(selectionStart, selectionEnd, startLineNum)) {
+                        //需要空行
+                        data.textBefore = data.textBefore.trim() +"\n\n";
+                        data.textAfter = "\n\n" + data.textAfter.trim();
+                        data.textMiddle = data.textMiddle.trim();
+                        insertStringOnEveryLine("", "", "    ", 0, data);
+                    } else {
+                        //不需要空行
+                        insertStringOnStartEnd("`", "`", "enter code here", data);
+                    }
+                };
+                break;
+            case 'fa-list-ul': insertStringOnStartEnd("\n 1. ", "\n", "List Item", data); break;
+            case 'fa-list-ol': insertStringOnStartEnd("\n - ", "\n", "List Item", data); break;
+            case 'fa-file': openModelDialogForUpload('file'); break;
         }
 
         _options.onTextChange();
     }
 
-    function cursorInLineStart()
-    {
-        var re = /(\s)+/g;
-        var lines = _eleditorContent.value.substr(0, _eleditorContent.selectionStart).split("\n");
-        var text = lines[lines.length - 1];
-        if (text == "")
-        {
-            return true;
+    function hasSelectedWholeLine(startCursor, endCursor,lineNum) {
+            let arr = _eleditorContent.value.split("\n");
+            if ((endCursor - startCursor) == arr[lineNum-1].length) {
+                return true;
+            } else {
+                return false;
+            }
         }
-        var txt = re.exec(text);
-        if (txt && txt != "") {
+
+    function getLineNum(index) {
+        return _eleditorContent.value.substr(0, index).split("\n").length;
+    }
+    
+
+    function cursorInLineStart(textBefore, textAfter) {
+        var preLines = textBefore.split("\n");
+        var preTxt = preLines[preLines.length - 1];
+        var postLines = textAfter.split("\n");
+        var postTxt = postLines[0];
+        if (preTxt.trim() == "" && postTxt.trim() == "") {
             return true;
-        } else
-        {
+        } else {
             return false;
         }
     }
@@ -112,7 +158,6 @@
     }
 
 
-
     //insert string into textare on cursor position
     function insertStringOnCursor(str) {
         var value = _eleditorContent.value;
@@ -123,58 +168,77 @@
         _eleditorContent.value = textBefore + str + textAfter;
     }
 
-    function insertStringOnStartEnd(startText,endText,defaultText) {
-
-        var hasTextMiddle = true;
-        var value = _eleditorContent.value ? _eleditorContent.value : _eleditorContent.innerText;
-        var selectionStart = _eleditorContent.selectionStart;
-        var selectionEnd = _eleditorContent.selectionEnd;
-        var textBefore = _eleditorContent.value.substring(0, selectionStart);
-        var textMiddle = _eleditorContent.value.substring(selectionStart, selectionEnd);
-        if (!textMiddle)
-        {
-            hasTextMiddle = false;
-            textMiddle = defaultText;
+    function insertStringOnEveryLine(startStr, endStr, insertStr, lineIndex, data) {
+        var newSelectionStart, newSelectionEnd;
+        newSelectionStart = data.textBefore.length;
+        var lines = data.textMiddle.split("\n");
+        var tmpMiddleText = "";
+        for (let i = 0; i < lines.length; i++) {
+            let tmpStr = lines[i];
+            tmpMiddleText += tmpStr.substr(0, lineIndex).trim() + insertStr + tmpStr.substr(lineIndex, tmpStr.length).trim() + "\n";
         }
-        var textAfter = _eleditorContent.value.substring(selectionEnd, value.length);
+        tmpMiddleText = tmpMiddleText.substr(0, tmpMiddleText.length - 1);
+        _eleditorContent.value = data.textBefore + startStr + tmpMiddleText + endStr + data.textAfter;
+        newSelectionEnd = newSelectionStart + tmpMiddleText.length;
+        autoSelectRange(_eleditorContent, newSelectionStart, newSelectionEnd);
+    }
 
-        _eleditorContent.value = textBefore + startText + textMiddle + endText + textAfter;
-        if (!hasTextMiddle)
+    function insertStringOnStartEnd(startText, endText, defaultText, data) {
+
+        if (!data)
         {
-            var newSelectionStart = selectionStart + startText.length;
-            var newSelectionEnd = startText.length + selectionEnd + textMiddle.length;
+            var value = _eleditorContent.value ? _eleditorContent.value : _eleditorContent.innerText;
+            var selectionStart = _eleditorContent.selectionStart;
+            var selectionEnd = _eleditorContent.selectionEnd;
+            var textBefore = _eleditorContent.value.substring(0, selectionStart);
+            var textMiddle = _eleditorContent.value.substring(selectionStart, selectionEnd);
+            var textAfter = _eleditorContent.value.substring(selectionEnd, value.length);
+            data = {
+                textBefore: textBefore,
+                textMiddle: textMiddle,
+                textAfter: textAfter,
+                selectionStart: selectionStart,
+                selectionEnd: selectionEnd
+            }
+        }
+        var hasTextMiddle = true;
+
+        if (!data.textMiddle) {
+            hasTextMiddle = false;
+            data.textMiddle = defaultText;
+        }
+        _eleditorContent.value = data.textBefore + startText + data.textMiddle + endText + data.textAfter;
+        if (!hasTextMiddle) {
+            var newSelectionStart = data.selectionStart + startText.length;
+            var newSelectionEnd = startText.length + data.selectionEnd + data.textMiddle.length;
             autoSelectRange(_eleditorContent, newSelectionStart, newSelectionEnd);
         }
-        
+
     }
 
     function openModelDialogForUpload(mode) {
         eluploader.show(mode);
     }
 
-    function initOptions(opts)
-    {
-        for (var key in opts)
-        {
+    function initOptions(opts) {
+        for (var key in opts) {
             _options[key] = opts[key];
         }
     }
-    
-    function render(options)
-    {
+
+    function render(options) {
         initOptions(options);
         //Initialize some of the options
-        
+
         _options.textareaId = _options.textareaId ? _options.textareaId : 'eleditor_textarea';
 
         //init the uploader
         var imageCallback = function (text) {
-            insertStringOnStartEnd("![","](" + text + ")","enter image description here");
+            insertStringOnStartEnd("![", "](" + text + ")", "enter image description here");
             _options.onTextChange();
         }
-        var fileCallback=function(text)
-        {
-            insertStringOnStartEnd("[","](" + text + ")","enter file description here");
+        var fileCallback = function (text) {
+            insertStringOnStartEnd("[", "](" + text + ")", "enter file description here");
             _options.onTextChange();
         }
         eluploader.render({
@@ -183,8 +247,8 @@
                 uploadCallback: imageCallback
             },
             "file": {
-                uploadUrl:_options.uploadUrl,
-                uploadCallback:fileCallback
+                uploadUrl: _options.uploadUrl,
+                uploadCallback: fileCallback
             }
         });
 

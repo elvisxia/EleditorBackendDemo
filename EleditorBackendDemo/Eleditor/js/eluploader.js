@@ -14,6 +14,7 @@
         "</div>" +
         "<div id='eluploader_bottom_zone'>" +
         "<button id='eluploader_save' class='btn btn-success'>Add</button>" +
+        "<input id='inputFile' type='file' style='opacity: 0.0; position: absolute;visibility:hidden;' />"+
         "</div>" +
         "</div>" +
         "</div>";
@@ -41,7 +42,7 @@
         }
     }
 
-    var _linkGuide, _linkhref, _link, _cancelLink, _dropzone, _btnAddPic, _webPic;
+    var _linkGuide, _linkhref, _link, _cancelLink, _dropzone, _btnAddPic, _webPic,_inputFile;
     var formData;
     var maxSize;
     var _mode = "image";
@@ -107,6 +108,8 @@
         _btnAddPic = document.getElementById('eluploader_save');
         _linkGuide.style.display = "block";
         _link.style.display = "none";
+        _inputFile = document.getElementById("inputFile");
+
 
         //events
         window.onclick = function (evt) {
@@ -121,6 +124,14 @@
         _cancelLink.onclick = function () {
             _linkGuide.style.display = "block";
             _link.style.display = "none";
+        }
+
+        _inputFile.onchange = function (e) {
+            e.preventDefault();
+            readFiles(_inputFile.files);
+        }
+        _dropzone.onclick = function (e) {
+            _inputFile.click();
         }
         _dropzone.ondragover = function (e) {
             return false;
