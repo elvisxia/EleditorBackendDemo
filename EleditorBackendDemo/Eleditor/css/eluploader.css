@@ -20,8 +20,7 @@
 
 #eluploader_content {
     width: 680px;
-    min-height: 460px;
-    height: 580px;
+    min-height: 260px;
     margin: 15% auto;
     background-color: white;
 }
@@ -67,7 +66,7 @@
 
 #eluploader_bottom_zone {
     width: 100%;
-    height: 30%;
+    height: 18%;
     background-color: cornflowerblue;
 }
 

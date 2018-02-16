@@ -23,6 +23,7 @@
         border: 1px solid transparent;
         border-radius: 3px;
         cursor: pointer;
+        position:relative;
     }
 
     .eleditor_toolbar .separator {
@@ -65,4 +66,36 @@
     padding: 20px;
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */
+}
+
+
+.eleditor_toolbar li .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltiptext::after {
+    content: "  ";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent black transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.eleditor_toolbar li:hover .tooltiptext {
+    visibility: visible;
 }

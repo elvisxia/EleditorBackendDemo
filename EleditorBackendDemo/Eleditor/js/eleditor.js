@@ -22,18 +22,18 @@
     function initTemplate() {
         _template = "<div class='eleditor_container'>" +
             "<ul id='eleditor_ul' class='eleditor_toolbar'>" +
-            "<li id='fa-bold' class='fa fa-bold'></li>" +
-            "<li id='fa-italic' class='fa fa-italic'></li>" +
-            "<li id='fa-header' class='fa fa-header'></li>" +
+            "<li id='fa-bold' class='fa fa-bold'><span class='tooltiptext'>Bold</span></li>" +
+            "<li id='fa-italic' class='fa fa-italic'><span class='tooltiptext'>Italic</span></li>" +
+            "<li id='fa-header' class='fa fa-header'><span class='tooltiptext'>Header </span></li>" +
             "<i class='separator'>|</i>" +
-            "<li id='fa-link' class='fa fa-link'></li>" +
-            "<li id='fa-quote' class='fa fa-quote-left'></li>" +
-            "<li id='fa-picture' class='fa fa-picture-o'></li>" +
-            "<li id='fa-file' class='fa fa-file'></li>" +
-            "<li id='fa-code' class='fa fa-code'></li>" +
+            "<li id='fa-link' class='fa fa-link'><span class='tooltiptext'>Link</span></li>" +
+            "<li id='fa-quote' class='fa fa-quote-left'><span class='tooltiptext'>Quote</span></li>" +
+            "<li id='fa-picture' class='fa fa-picture-o'><span class='tooltiptext'>Picture</span></li>" +
+            "<li id='fa-file' class='fa fa-file'><span class='tooltiptext'>Upload File</span></li>" +
+            "<li id='fa-code' class='fa fa-code'><span class='tooltiptext'>Code</span></li>" +
             "<i class='separator'>|</i>" +
-            "<li id='fa-list-ol' class='fa fa-list-ul'></li>" +
-            "<li id='fa-list-ul' class='fa fa-list-ol'></li>" +
+            "<li id='fa-list-ol' class='fa fa-list-ul'><span class='tooltiptext'> Ul </span></li>" +
+            "<li id='fa-list-ul' class='fa fa-list-ol'><span class='tooltiptext'> Nummbered List </span></li>" +
             "<i class='separator'>|</i>" +
             "</ul>" +
             "<textarea style='padding:10px' id='" + _options.textareaId + "' class='eleditor_content'></textarea>" +
@@ -77,7 +77,7 @@
         switch (evt.srcElement.id) {
             case 'fa-bold': insertStringOnStartEnd("**", "**", "enter text here", data); break;
             case 'fa-italic': insertStringOnStartEnd("*", "*", "enter text here", data); break;
-            case 'fa-header': if (cursorInLineStart()) { insertStringOnStartEnd("##", "##\n", "Heading", data); } else { insertStringOnStartEnd("", "\n----------\n", "Heading", data); } break;
+            case 'fa-header': if (cursorInLineStart(textBefore, textAfter)) { insertStringOnStartEnd("##", "", "Heading", data); } else { insertStringOnStartEnd("", "\n----------\n", "Heading", data); } break;
             case 'fa-picture': openModelDialogForUpload('image'); break;
             case 'fa-link': insertStringOnStartEnd("[", "](http://)", "enter link description here", data); break;
             case 'fa-quote': 
