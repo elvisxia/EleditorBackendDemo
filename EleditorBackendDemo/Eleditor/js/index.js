@@ -14,8 +14,13 @@
             previewElementId: "divResult",//the preview div element
             textareaId: "mTextArea",//the id of the textarea will be applied
             onTextChange: function () {
-                var reg = new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi);
+                var reg = new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9\s@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi);
                 var tmp = reg.exec(textArea.value);
+                if (tmp != null) {
+                    text = textArea.value.replace(tmp[0], encodeURI(tmp[0]));
+                } else {
+                    text = textArea.value;
+                }
                 result.innerHTML = converter.makeHtml(textArea.value);
             }//the callback that will be applied when strings are inserted into textarea.
 
