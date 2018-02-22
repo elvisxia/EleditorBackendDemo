@@ -107,7 +107,6 @@
     <Content Include="Eleditor\lib\angular.min.js" />
     <Content Include="Eleditor\lib\bootstrap.min.js" />
     <Content Include="Eleditor\lib\jquery.min.js" />
-    <Content Include="Eleditor\lib\markdownit.js" />
     <Content Include="Eleditor\lib\showdown.js" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />

@@ -5,7 +5,7 @@
     var _options = {
         elementId: null,
         previewElementId: "divResult",
-        uploadUrl: "http://localhost:4033/api/imageupload/uploadfile",
+        uploadUrl: "",
         textareaId: "textareaId",
         onTextChange: function () { }
     }
