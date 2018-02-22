@@ -109,7 +109,10 @@
     <Content Include="Eleditor\lib\jquery.min.js" />
     <Content Include="Eleditor\lib\showdown.js" />
     <Content Include="Global.asax" />
-    <Content Include="Web.config" />
+    <Content Include="tmp\Untitled.png" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
@@ -155,8 +158,8 @@
     <Content Include="Eleditor\css\font-awesome\scss\_stacked.scss" />
     <Content Include="Eleditor\css\font-awesome\scss\_variables.scss" />
     <None Include="packages.config" />
-    <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
-    <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
+    <None Include="Properties\PublishProfiles\EleditorDemo - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -166,7 +169,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="tmp\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

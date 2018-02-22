@@ -14,8 +14,7 @@
     myApp.controller("RootController", function ($scope) {
 
         var converter = new showdown.Converter();
-        //var baseUrl = "http://10.168.172.166:4003/";
-        var baseUrl = "http://localhost:1137/";
+        var baseUrl = "https://eleditordemo.azurewebsites.net/";
         var uploadUrl = baseUrl + "api/imageupload/uploadfile";
         
 
