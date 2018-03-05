@@ -161,7 +161,11 @@
             }
             //No image
             else {
-                alert('please put an image');
+                if (fileMode) {
+                    alert('please put a file');
+                } else {
+                    alert('please put an image')
+                }
             }
         }
     }
